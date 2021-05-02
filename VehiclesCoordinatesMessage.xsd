@@ -28,35 +28,31 @@
 	</xs:complexType>
 	<!-- Message Types -->
 	<!-- RequestMessageType -->
-	<xs:complexType name="VehiclesCoordinatesRequestMessageType">
-		<xs:sequence>
-			<xs:element name="Header" type="msg:HeaderType"/>
-			<xs:element name="Request" type="msg:RequestType" minOccurs="0"/>
-			<xs:element name="Payload" type="tns:VehiclesCoordinatesPayloadType" minOccurs="0"/>
-		</xs:sequence>
-	</xs:complexType>
 	<!-- ResponseMessageType -->
-	<xs:complexType name="VehiclesCoordinatesResponseMessageType">
+        <xs:element name="VehiclesCoordinatesResponseMessage">
+	<xs:complexType>
 		<xs:sequence>
 			<xs:element name="Header" type="msg:HeaderType"/>
 			<xs:element name="Reply" type="msg:ReplyType"/>
 			<xs:element name="Payload" type="tns:VehiclesCoordinatesPayloadType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+        </xs:element>
 	<!-- EventMessageType -->
-	<xs:complexType name="VehiclesCoordinatesEventMessageType">
+        <xs:element name="ChangedVehiclesCoordinates">
+	<xs:complexType>
 		<xs:sequence>
 			<xs:element name="Header" type="msg:HeaderType"/>
 			<xs:element name="Payload" type="tns:VehiclesCoordinatesPayloadType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+        </xs:element>
 	<!-- FaultMessageType -->
-	<xs:complexType name="VehiclesCoordinatesFaultMessageType">
+        <xs:element name="VehiclesCoordinatesFaultMessage">
+	<xs:complexType>
 		<xs:sequence>
 			<xs:element name="Reply" type="msg:ReplyType"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:element name="ChangedVehiclesCoordinates" type="tns:VehiclesCoordinatesEventMessageType"/>
-	<xs:element name="VehiclesCoordinatesResponseMessage" type="tns:VehiclesCoordinatesResponseMessageType"/>
-	<xs:element name="VehiclesCoordinatesFaultMessage" type="tns:VehiclesCoordinatesFaultMessageType"/>
+        </xs:element>
 </xs:schema>
