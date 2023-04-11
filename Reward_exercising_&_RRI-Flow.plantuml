@@ -1,0 +1,87 @@
+@@startuml  Tenant Exercise by scaning member QR code
+participant "Tenant App" as TA
+participant "Shopper App" as SA
+participant Mulesoft as M
+participant Antavo as Ant
+participant Salesforce as SF
+participant Ali as Ali
+
+hide footbox
+skinparam roundcorner 20
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+activate TA
+    group <b>scan Member QR code </b>
+        activate SA
+            SA -> TA : Tenant scan member QR code.
+        deactivate SA
+        activate M
+            TA -> M : Call GET /claims API
+            activate Ant
+                M -> Ant: Get available coupons list
+                Ant -> M: Coupons list response
+            deactivate Ant
+            M -> TA : Member coupons list
+        deactivate M
+        TA -> TA: Display only available counpons and\n rewards with same Tenant APP tenantID
+        activate TA
+        deactivate TA
+        TA -> TA: Pick Rewards and Coupons : <b>Limit=25</b>
+        activate TA
+        deactivate TA
+    end
+    group verification success
+        alt <font color=Blue>Success</font>
+            TA -> M: Exercise coupons(Max: 25 coupons)
+            activate M
+                activate Ant
+                    M -> Ant: Call bulk event API with \n<b>'action=coupon_redeem'</b> and <b>'exerciseChannel=HKL_TEN'</b>
+                    Ant -> M: Exercise N coupons response
+                deactivate Ant
+                activate SF
+                    M -> SF: Call APEX calss(custome API) to Create RR invoice.
+                    SF -> SF: Create RRI
+                    note right of SF: If RR not found,\nThe SF should create RR placeholder.
+                    SF -> M: Return Salesforce RRI Id
+                    M -> TA : Success response with  RRI Id
+                deactivate SF
+            deactivate M
+            TA -> TA: Tenant to input invoice amount & date.
+            activate TA
+            deactivate TA
+            group Webhook
+                activate M
+                    activate Ant
+                        Ant -> M: Exercise webhook call
+                        activate SF
+                            M -> SF: Update RR record with <b>status=Exercised</b> and <b>exerciseChannel=HKL_TEN</b>
+                            activate Ali
+                                SF-> Ali:Update RR record with <b>status=Exercised</b>
+                            deactivate Ali
+                        deactivate SF
+                    deactivate Ant
+                deactivate M
+            end
+           
+        else #ffebe6 <font color=Red>Partial Success or failed</font>
+            TA -> M: Exercise vouchers
+            activate M
+                activate Ant
+                    M -> Ant: Call bulk event API with <b>'action=coupon_redeem'</b> and <b>'exerciseChannel=HKL_TEN'</b>
+                    Ant -> M : N coupons success & M coupons failed
+                    M -> Ant : <b>Void</b> all exciersed N coupons with <b>'action=coupon_unredeem'</b> and <b>'voidChannel=HKL_TEN'</b>
+                deactivate Ant
+                M -> TA : Failed Response
+            deactivate M
+            TA -> TA: Display Error pop-up message \nand return back to retry page
+            activate TA
+            deactivate TA
+            note right of TA: TBD on error messages
+        end
+    end
+@@enduml
+
+
+
+
